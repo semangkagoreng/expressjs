@@ -108,6 +108,62 @@ app.put('/api/users/:id', (req,res) => {
     )
 })
 
+app.patch('/api/users/:id', (req, res) => {
+  const {body, params} = req;
+  const id = parseInt(params.id)
+
+  if(isNaN(id) || !body) return res.status(400).send({
+    status:false,
+    msg: "bad request"
+  })
+
+  const user = mockUsers.find((u) => {
+    return u.id === id
+  })
+
+  if(!user) return res.status(404).send({
+    status: false,
+    msg: "user not found"
+  })
+
+  const updatedUsers = {
+    ...user,
+    ...body
+  }
+  
+  mockUsers[id-1] = updatedUsers;
+  res.send({
+    status: true,
+    data: updatedUsers
+  })
+})
+
+app.delete('/api/users/:id', (req,res) => {
+  let {params:{id}} = req;
+  id = parseInt(id);
+
+  if(isNaN(id)) return res.statusSend(400).send({
+    status: false,
+    msg: "bad request"
+  })
+
+  const userId = mockUsers.findIndex((u) => {
+    return u.id === id
+  })
+
+  if(userId === -1) return res.status(404).send({
+    status:false,
+    msg: "user not found"
+  })
+
+  mockUsers.splice(userId, 1);
+  res.send({
+    status: true,
+    msg: "user deleted succesfully",
+    data : mockUsers
+  })
+})
+
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
 });
